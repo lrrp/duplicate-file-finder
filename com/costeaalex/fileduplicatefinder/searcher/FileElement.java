@@ -1,6 +1,8 @@
 package com.costeaalex.fileduplicatefinder.searcher;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 
 public class FileElement implements Comparable<FileElement>
 	{
@@ -14,7 +16,7 @@ public class FileElement implements Comparable<FileElement>
 	
 	public String getFileName()
 		{
-		return file.getName();
+		return file.getAbsolutePath()+"-"+file.length();
 		}
 	
 	public boolean delete()
@@ -25,6 +27,23 @@ public class FileElement implements Comparable<FileElement>
 	public long getSize()
 		{
 		return file.length();
+		}
+	
+	public void open()
+		{
+		try
+			{
+			Desktop.getDesktop().open(file);
+			}
+		catch (IOException e)
+			{
+			e.printStackTrace();
+			}
+		}
+	
+	public void remove()
+		{
+		file.delete();
 		}
 	
 	@Override

@@ -1,20 +1,20 @@
 package com.costeaalex.fileduplicatefinder.app;
 
-import java.io.File;
+/*import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collections;*/
 
-import com.costeaalex.fileduplicatefinder.searcher.FileElement;
-import com.costeaalex.fileduplicatefinder.searcher.Searcher;
+import com.costeaalex.fileduplicatefinder.gui.FDFGui;
+/*import com.costeaalex.fileduplicatefinder.searcher.FileElement;
+import com.costeaalex.fileduplicatefinder.searcher.Searcher;*/
 
 public class FDF
 	{
 	
 	public static void main(String [] args)
 		{
-		Searcher s=new Searcher();
-		s.search(new File("."));
-		s.list();
+		FDFGui fG=new FDFGui("test");
+		fG.buildGui();
 		
 		//System.out.println("aa");
 		/*FileElement a= new FileElement("A",1,null);
