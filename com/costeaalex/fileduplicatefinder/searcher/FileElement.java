@@ -1,9 +1,7 @@
 package com.costeaalex.fileduplicatefinder.searcher;
 
 import java.awt.Desktop;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class FileElement implements Comparable<FileElement>
@@ -31,28 +29,9 @@ public class FileElement implements Comparable<FileElement>
 		return file.length();
 		}
 	
-	public void open()
+	public void open() throws IOException
 		{
-		try
-			{
-			Desktop.getDesktop().open(file);
-			}
-		catch (IOException e)
-			{
-			try
-				{
-				FileWriter errorLog=new FileWriter("Error.log", true);
-				BufferedWriter out = new BufferedWriter(errorLog);
-				out.write(e.getMessage());	
-				out.flush();
-				out.close();
-				}
-			catch (IOException e1)
-				{
-				e1.printStackTrace();
-				}
-			e.printStackTrace();
-			}
+		Desktop.getDesktop().open(file);
 		}
 	
 	public void remove()
