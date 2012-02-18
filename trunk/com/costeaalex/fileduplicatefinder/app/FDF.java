@@ -9,6 +9,6 @@ public class FDF
 		{
 		FDFGui fG=new FDFGui("test");
 		fG.buildGui();
-				}
+		}
 	
 	}
