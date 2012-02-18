@@ -5,26 +5,16 @@ import java.io.File;
 public class FileElement implements Comparable<FileElement>
 	{
 	
-	private String fileName;
-	private long size;
 	private File file;
 	
-	public FileElement()
+	public FileElement(File file)
 		{
-		this.fileName="";
-		this.size=0;
-		}
-	
-	public FileElement(String filename, long size, File file)
-		{
-		this.fileName=filename;
-		this.size=size;
 		this.file=file;
 		}
 	
 	public String getFileName()
 		{
-		return fileName;
+		return file.getName();
 		}
 	
 	public boolean delete()
@@ -32,19 +22,9 @@ public class FileElement implements Comparable<FileElement>
 		return file.delete();
 		}
 	
-	public void setFileName(String fileName)
-		{
-		this.fileName = fileName;
-		}
-	
 	public long getSize()
 		{
-		return size;
-		}
-	
-	public void setSize(long size)
-		{
-		this.size = size;
+		return file.length();
 		}
 	
 	@Override
@@ -58,8 +38,8 @@ public class FileElement implements Comparable<FileElement>
 	public int compareTo(FileElement arg0)
 		{
 		if(arg0 instanceof FileElement)
-			return this.fileName.compareTo(arg0.fileName);
-		return 0;
+			return file.getName().compareTo(arg0.getFileName());
+		throw new IllegalArgumentException();
 		}
 	
 	}
