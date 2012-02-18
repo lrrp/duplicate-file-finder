@@ -25,7 +25,7 @@ public class Searcher
 			else
 				{
 				File f=new File(directory.getAbsolutePath()+"\\"+files[i]);
-				fileList.add(new FileElement(f.getName(), f.length(), f));
+				fileList.add(new FileElement(f));
 				}
 			}
 		}

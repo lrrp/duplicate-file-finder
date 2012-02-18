@@ -7,7 +7,7 @@ import java.util.Collections;
 import com.costeaalex.fileduplicatefinder.searcher.FileElement;
 import com.costeaalex.fileduplicatefinder.searcher.Searcher;
 
-public class FileDuplicateFinder
+public class FDF
 	{
 	
 	public static void main(String [] args)
