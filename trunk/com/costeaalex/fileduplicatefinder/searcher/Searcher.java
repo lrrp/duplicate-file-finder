@@ -4,11 +4,23 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Observable;
 
-public class Searcher
+public class Searcher extends Observable implements Runnable
 	{
 	
 	private ArrayList<FileElement> fileList=new ArrayList<FileElement>();
+	File directory;
+	
+	public Searcher(File directory)
+		{
+		this.directory=directory;
+		}
+	
+	public ArrayList<FileElement> getFileList()
+		{
+		return fileList;
+		}
 	
 	public void search(File directory)
 		{
@@ -25,7 +37,10 @@ public class Searcher
 			else
 				{
 				File f=new File(directory.getAbsolutePath()+"\\"+files[i]);
-				fileList.add(new FileElement(f));
+				FileElement fE=new FileElement(f);
+				fileList.add(fE);
+				setChanged();
+				notifyObservers(fE);
 				}
 			}
 		}
@@ -33,6 +48,14 @@ public class Searcher
 	public ArrayList<FileElement> sort()
 		{
 		Collections.sort(fileList);
+		setChanged();
+		notifyObservers(fileList);
+		return fileList;
+		}
+	
+	public ArrayList<FileElement> clean()
+		{
+		
 		return fileList;
 		}
 	
@@ -44,5 +67,14 @@ public class Searcher
 			FileElement f=i.next();
 			System.out.println(f.getFileName() + " - " + f.getSize());
 			}
+		}
+
+	public void run()
+		{
+		search(directory);
+		sort();
+		clean();
+		setChanged();
+		notifyObservers("Done");
 		}
 	}
