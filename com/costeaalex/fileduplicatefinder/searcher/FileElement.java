@@ -1,7 +1,9 @@
 package com.costeaalex.fileduplicatefinder.searcher;
 
 import java.awt.Desktop;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class FileElement implements Comparable<FileElement>
@@ -16,7 +18,7 @@ public class FileElement implements Comparable<FileElement>
 	
 	public String getFileName()
 		{
-		return file.getAbsolutePath()+"-"+file.length();
+		return file.getAbsolutePath();
 		}
 	
 	public boolean delete()
@@ -37,6 +39,18 @@ public class FileElement implements Comparable<FileElement>
 			}
 		catch (IOException e)
 			{
+			try
+				{
+				FileWriter errorLog=new FileWriter("Error.log", true);
+				BufferedWriter out = new BufferedWriter(errorLog);
+				out.write(e.getMessage());	
+				out.flush();
+				out.close();
+				}
+			catch (IOException e1)
+				{
+				e1.printStackTrace();
+				}
 			e.printStackTrace();
 			}
 		}
