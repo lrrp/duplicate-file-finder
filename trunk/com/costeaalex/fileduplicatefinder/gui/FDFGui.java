@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.Popup;
 import javax.swing.PopupFactory;
 import javax.swing.SwingUtilities;
@@ -46,6 +47,8 @@ public class FDFGui implements ActionListener,Observer
 	
 	private JFrame jF;
 	private JButton jBAction;
+	private JButton jBDeleteSelected;
+	private JButton jBDeleteMarked;
 	private JButton jBE;
 	private JScrollPane jSPResults;
 	private Container container;
@@ -53,12 +56,13 @@ public class FDFGui implements ActionListener,Observer
 	private Thread sT;
 	private int index;
 	private JPopupMenu jPM;
-	private JMenuItem menuItemDelete;
+	private JMenuItem menuItemDeleteSelected;
+	private JMenuItem menuItemDeleteMarked;
 	private String searchDirectory;
 	private ArrayList<FileElement> list;
 	private JTableCustom jT;
 	private DefaultTableModel tableModel;
-	private String [] columns = {"File", "Size" };
+	private String [] columns = {"File", "Size", "Mark" };
 	private Popup popUpWindowError;
 	
 	public FDFGui(String searchDirectory)
@@ -100,25 +104,48 @@ public class FDFGui implements ActionListener,Observer
 		jBAction=new JButton("Find");
 		jBAction.addActionListener(this);
 		
+		jBDeleteSelected=new JButton("Delete selected");
+		jBDeleteSelected.addActionListener(this);
+		jBDeleteSelected.setEnabled(false);
+		
+		jBDeleteMarked=new JButton("Delete marked");
+		jBDeleteMarked.addActionListener(this);
+		jBDeleteMarked.setEnabled(false);
+		
 		tableModel = new DefaultTableModel(null, columns);
+			/*{
+			public Class getColumnClass(int c) 
+				{
+		        return getValueAt(0, c).getClass();
+		        }
+			};*/
 		jT=new JTableCustom(tableModel);
 		jT.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		jT.getColumnModel().getColumn(0).setPreferredWidth(612);
+		jT.getColumnModel().getColumn(0).setPreferredWidth(562);
 		jT.getColumnModel().getColumn(1).setPreferredWidth(150);
+		jT.getColumnModel().getColumn(2).setPreferredWidth(50);
 		JTableHeader header = jT.getTableHeader();
 		header.setBackground(Color.white);
+		jT.getColumn("Mark").setCellRenderer(new CheckBoxCellRenderer());
+		jT.getColumn("Mark").setCellEditor(new CheckBoxEditor());
+		jT.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		jSPResults=new JScrollPane(jT);
 		jSPResults.setPreferredSize(new Dimension(780, 530));
 		
 		jPM=new JPopupMenu();
-		menuItemDelete = new JMenuItem("Delete");
-		menuItemDelete.addActionListener(this);
-		jPM.add(menuItemDelete);
+		menuItemDeleteSelected = new JMenuItem("Delete Selected");
+		menuItemDeleteMarked = new JMenuItem("Delete Marked");
+		menuItemDeleteSelected.addActionListener(this);
+		menuItemDeleteMarked.addActionListener(this);
+		jPM.add(menuItemDeleteSelected);
+		jPM.add(menuItemDeleteMarked);
 		
 		container=jF.getContentPane();
 		container.setLayout(new FlowLayout());
 		
 		container.add(jBAction);
+		container.add(jBDeleteSelected);
+		container.add(jBDeleteMarked);
 		container.add(jSPResults);
 		
 		jF.setVisible(true);
@@ -126,7 +153,7 @@ public class FDFGui implements ActionListener,Observer
 
 	public void actionPerformed(ActionEvent e)
 		{
-		if(e.getSource() instanceof JButton)
+		if(e.getSource() == jBAction)
 			{
 			s=new Searcher(new File(searchDirectory));
 			sT=new Thread(s);
@@ -134,10 +161,24 @@ public class FDFGui implements ActionListener,Observer
 			jBAction.setEnabled(false);
 			sT.start();
 			}
-		if(e.getSource() == menuItemDelete)
+		if(e.getSource() == jBDeleteSelected)
 			{
-			tableModel.removeRow(selectedItem);
-			list.get(selectedItem).remove();
+			
+			}
+		if(e.getSource() == jBDeleteMarked)
+			{
+			
+			}
+		if(e.getSource() == menuItemDeleteSelected)
+			{
+			//tableModel.removeRow(selectedItem);
+			//list.get(selectedItem).remove();
+			//System.out.println(list.get(selectedItem).getFileName());
+			}
+		if(e.getSource() == menuItemDeleteMarked)
+			{
+			//tableModel.removeRow(selectedItem);
+			//list.get(selectedItem).remove();
 			//System.out.println(list.get(selectedItem).getFileName());
 			}
 		if(e.getSource() == jBE)
@@ -168,7 +209,7 @@ public class FDFGui implements ActionListener,Observer
 						while (tableModel.getRowCount()>0)
 							tableModel.removeRow(0);
 						for(int i=0; i<list.size(); i++)
-							tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize()});
+							tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize(), new Boolean(false)});
 						}
 					});
 				
@@ -176,11 +217,12 @@ public class FDFGui implements ActionListener,Observer
 					{
 					public void mouseClicked(MouseEvent mouseEvent) 
 						{
-						JTableCustom theList = (JTableCustom) mouseEvent.getSource();
+						JTableCustom tableCustom = (JTableCustom) mouseEvent.getSource();
 						if (mouseEvent.getClickCount() == 2) 
 							{
-							int index = theList.rowAtPoint(mouseEvent.getPoint());
-							if (index >= 0) 
+							int index = tableCustom.rowAtPoint(mouseEvent.getPoint());
+							int column = tableCustom.columnAtPoint(mouseEvent.getPoint()); 
+							if (index >= 0 && column!=2) 
 								{
 								FileElement f = list.get(index);
 								try
@@ -209,14 +251,15 @@ public class FDFGui implements ActionListener,Observer
 						
 						if (SwingUtilities.isRightMouseButton(mouseEvent))
 				            {
-				            selectedItem=theList.rowAtPoint(mouseEvent.getPoint());
-				            theList.getSelectionModel().setSelectionInterval(selectedItem, selectedItem);
-				            jPM.show(theList, mouseEvent.getX(), mouseEvent.getY());
+				            //selectedItem=tableCustom.rowAtPoint(mouseEvent.getPoint());
+				            //tableCustom.getSelectionModel().setSelectionInterval(selectedItem, selectedItem);
+				            jPM.show(tableCustom, mouseEvent.getX(), mouseEvent.getY());
 				            }
 						}
 					};
 			    jT.addMouseListener(mouseListener);
-			    
+				jBDeleteSelected.setEnabled(true);
+				jBDeleteMarked.setEnabled(true);
 				}
 			}
 		
@@ -228,7 +271,7 @@ public class FDFGui implements ActionListener,Observer
 				{	
 				public void run()
 					{
-					tableModel.insertRow(index, new Object[]{str, ""});
+					tableModel.insertRow(index, new Object[]{str, "", new Boolean(false)});
 					index++;
 					}
 				});
@@ -245,7 +288,7 @@ public class FDFGui implements ActionListener,Observer
 					while (tableModel.getRowCount()>0)
 						tableModel.removeRow(0);
 					for(int i=0; i<list.size(); i++)
-						tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize()});
+						tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize(), new Boolean(false)});
 					}
 				});
 			}

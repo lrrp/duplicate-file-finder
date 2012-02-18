@@ -19,7 +19,8 @@ public class JTableCustom extends JTable
 	@Override
 	public boolean isCellEditable(int row, int column)
 		{
-		// TODO Auto-generated method stub
+		if(column==2)
+			return true;
 		return false;
 		}
 
