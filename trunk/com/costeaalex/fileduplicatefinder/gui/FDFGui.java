@@ -1,6 +1,8 @@
 package com.costeaalex.fileduplicatefinder.gui;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,15 +14,16 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-//import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+
 
 import com.costeaalex.fileduplicatefinder.searcher.FileElement;
 import com.costeaalex.fileduplicatefinder.searcher.Searcher;
@@ -32,16 +35,17 @@ public class FDFGui implements ActionListener,Observer
 	private JFrame jF;
 	private JButton jBAction;
 	private JScrollPane jSPResults;
-	private JList jLResults;
 	private Container container;
 	private Searcher s;
 	private Thread sT;
-	private DefaultListModel model;
 	private int index;
 	private JPopupMenu jPM;
 	private JMenuItem menuItemDelete;
 	private String searchDirectory;
 	private ArrayList<FileElement> list;
+	private JTableCustom jT;
+	private DefaultTableModel tableModel;
+	private String [] columns = {"File", "Size" };
 	
 	public FDFGui(String searchDirectory)
 		{
@@ -58,11 +62,22 @@ public class FDFGui implements ActionListener,Observer
 		jBAction=new JButton("Find");
 		jBAction.addActionListener(this);
 		
-		model = new DefaultListModel();
+		tableModel = new DefaultTableModel(null, columns);
+		jT=new JTableCustom(tableModel);
+		jT.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		jT.getColumnModel().getColumn(0).setPreferredWidth(612);
+		jT.getColumnModel().getColumn(1).setPreferredWidth(150);
+		JTableHeader header = jT.getTableHeader();
+		header.setBackground(Color.white);
+		jSPResults=new JScrollPane(jT);
+		jSPResults.setPreferredSize(new Dimension(780, 530));
+		
+		/*model = new DefaultListModel();
 		jLResults=new JList(model);
 		jLResults.setVisibleRowCount(35);
 		jLResults.setFixedCellWidth(570);
 		jSPResults=new JScrollPane(jLResults);
+		*/
 		
 		jPM=new JPopupMenu();
 		menuItemDelete = new JMenuItem("Delete");
@@ -90,9 +105,9 @@ public class FDFGui implements ActionListener,Observer
 			}
 		if(e.getSource() == menuItemDelete)
 			{
-			model.remove(selectedItem);
+			tableModel.removeRow(selectedItem);
 			//list.get(selectedItem).remove();
-			System.out.println(list.get(selectedItem).getFileName());
+			//System.out.println(list.get(selectedItem).getFileName());
 			}
 		}
 
@@ -115,9 +130,10 @@ public class FDFGui implements ActionListener,Observer
 					{
 					public void run()
 						{
-						model.removeAllElements();
+						while (tableModel.getRowCount()>0)
+							tableModel.removeRow(0);
 						for(int i=0; i<list.size(); i++)
-							model.add(i, list.get(i).getFileName());
+							tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize()});
 						}
 					});
 				
@@ -125,10 +141,10 @@ public class FDFGui implements ActionListener,Observer
 					{
 					public void mouseClicked(MouseEvent mouseEvent) 
 						{
-						JList theList = (JList) mouseEvent.getSource();
+						JTableCustom theList = (JTableCustom) mouseEvent.getSource();
 						if (mouseEvent.getClickCount() == 2) 
 							{
-							int index = theList.locationToIndex(mouseEvent.getPoint());
+							int index = theList.rowAtPoint(mouseEvent.getPoint());
 							if (index >= 0) 
 								{
 								FileElement f = list.get(index);
@@ -138,13 +154,13 @@ public class FDFGui implements ActionListener,Observer
 						
 						if (SwingUtilities.isRightMouseButton(mouseEvent))
 				            {
-				            selectedItem=theList.locationToIndex(mouseEvent.getPoint());
-				            theList.setSelectedIndex(theList.locationToIndex(mouseEvent.getPoint()));
+				            selectedItem=theList.rowAtPoint(mouseEvent.getPoint());
+				            theList.getSelectionModel().setSelectionInterval(selectedItem, selectedItem);
 				            jPM.show(theList, mouseEvent.getX(), mouseEvent.getY());
 				            }
 						}
 					};
-			    jLResults.addMouseListener(mouseListener);
+			    jT.addMouseListener(mouseListener);
 			    
 				}
 			}
@@ -157,7 +173,7 @@ public class FDFGui implements ActionListener,Observer
 				{	
 				public void run()
 					{
-					model.add(index, str);
+					tableModel.insertRow(index, new Object[]{str, ""});
 					index++;
 					}
 				});
@@ -171,9 +187,10 @@ public class FDFGui implements ActionListener,Observer
 				{
 				public void run()
 					{
-					model.removeAllElements();
+					while (tableModel.getRowCount()>0)
+						tableModel.removeRow(0);
 					for(int i=0; i<list.size(); i++)
-						model.add(i, list.get(i).getFileName());
+						tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize()});
 					}
 				});
 			}
