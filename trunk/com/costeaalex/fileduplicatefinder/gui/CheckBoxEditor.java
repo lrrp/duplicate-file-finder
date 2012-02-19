@@ -76,7 +76,7 @@ public class CheckBoxEditor extends JCheckBox implements TableCellEditor, ItemLi
 		for(int i=0; i<table.getRowCount(); i++)
 			if((Boolean) table.getValueAt(i, 2))
 				b=true;
-		//System.out.println(table.getSelectionModel().isSelectedIndex(i)+"-"+table.getValueAt(i, 2));
+		
 		if(b)
 			for(int i=0; i<table.getRowCount(); i++)
 				if((Boolean) table.getValueAt(i, 2))
