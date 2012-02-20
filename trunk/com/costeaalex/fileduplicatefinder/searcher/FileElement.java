@@ -14,9 +14,14 @@ public class FileElement implements Comparable<FileElement>
 		this.file=file;
 		}
 	
-	public String getFileName()
+	public String getAbsoluteFileName()
 		{
 		return file.getAbsolutePath();
+		}
+	
+	public String getFileName()
+		{
+		return file.getName();
 		}
 	
 	public boolean delete()
@@ -43,14 +48,20 @@ public class FileElement implements Comparable<FileElement>
 	public boolean equals(Object arg0)
 		{
 		if(arg0 instanceof FileElement)
-			return ((FileElement) arg0).getFileName().equals(this.getFileName());
+			return this.getFileName().equals(((FileElement) arg0).getFileName());
 		throw new IllegalArgumentException();
+		}
+	
+	@Override
+	public String toString()
+		{
+		return this.getAbsoluteFileName();
 		}
 
 	public int compareTo(FileElement arg0)
 		{
 		if(arg0 instanceof FileElement)
-			return file.getName().compareTo(arg0.getFileName());
+			return this.getFileName().compareTo(arg0.getFileName());
 		throw new IllegalArgumentException();
 		}
 	

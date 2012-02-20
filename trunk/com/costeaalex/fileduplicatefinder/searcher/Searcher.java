@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Observable;
+import java.util.Vector;
 
 public class Searcher extends Observable implements Runnable
 	{
@@ -55,6 +56,38 @@ public class Searcher extends Observable implements Runnable
 	
 	public ArrayList<FileElement> clean()
 		{
+		int i;
+		int dupcount=0;
+		Vector<FileElement> toRemove=new Vector<FileElement>();
+		FileElement dup=fileList.get(0);
+		for(i=1; i<fileList.size(); i++)
+			{
+			if(fileList.get(i).equals(dup))
+				{
+				dup=fileList.get(i);
+				dupcount++;
+				}
+			else
+				{
+				if(dupcount>0)
+					{
+					dup=fileList.get(i);
+					dupcount=0;
+					}
+				else
+					if(dupcount==0)
+						{
+						dup=fileList.get(i);
+						toRemove.add(fileList.get(i-1));
+						}
+				}
+			}
+		
+		if(dupcount==0)
+			toRemove.add(fileList.get(i-1));
+		
+		for(i=0; i<toRemove.size(); i++)
+			fileList.remove(toRemove.get(i));
 		
 		return fileList;
 		}
@@ -65,7 +98,7 @@ public class Searcher extends Observable implements Runnable
 		while(i.hasNext())
 			{
 			FileElement f=i.next();
-			System.out.println(f.getFileName() + " - " + f.getSize());
+			System.out.println(f.getAbsoluteFileName() + " - " + f.getSize());
 			}
 		}
 
