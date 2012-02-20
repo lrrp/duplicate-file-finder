@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -36,6 +37,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableModel;
 
 
 import com.costeaalex.fileduplicatefinder.searcher.FileElement;
@@ -163,28 +165,55 @@ public class FDFGui implements ActionListener,Observer
 			}
 		if(e.getSource() == jBDeleteSelected)
 			{
-			
+			deleteSelected(jT.getSelectedRows());
 			}
 		if(e.getSource() == jBDeleteMarked)
 			{
-			
+			deleteMarked();
 			}
 		if(e.getSource() == menuItemDeleteSelected)
 			{
-			//tableModel.removeRow(selectedItem);
-			//list.get(selectedItem).remove();
-			//System.out.println(list.get(selectedItem).getFileName());
+			deleteSelected(jT.getSelectedRows());
 			}
 		if(e.getSource() == menuItemDeleteMarked)
 			{
-			//tableModel.removeRow(selectedItem);
-			//list.get(selectedItem).remove();
-			//System.out.println(list.get(selectedItem).getFileName());
+			deleteMarked();
 			}
 		if(e.getSource() == jBE)
 			{
 			popUpWindowError.hide();
 			}
+		}
+	
+	public void updateTable()
+		{
+		clearTable(tableModel);
+		for(int i=0; i<list.size(); i++)
+			tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
+		}
+	
+	public boolean clearTable(DefaultTableModel tableM)
+		{
+		while(tableM.getRowCount()>0)
+			tableM.removeRow(0);
+		return true;
+		}
+	
+	public boolean deleteSelected(int [] toDelete)
+		{
+		Vector<FileElement> toRemove=new Vector<FileElement>();
+		for(int i=0; i<toDelete.length; i++)
+			toRemove.add(list.get(toDelete[i]));
+		for(int i=0; i<toRemove.size(); i++)
+			list.remove(toRemove.get(i));
+		return false;
+		}
+	
+	public boolean deleteMarked()
+		{
+		
+		
+		return false;
 		}
 
 	public void update(Observable o, Object arg)
@@ -209,7 +238,7 @@ public class FDFGui implements ActionListener,Observer
 						while (tableModel.getRowCount()>0)
 							tableModel.removeRow(0);
 						for(int i=0; i<list.size(); i++)
-							tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize(), new Boolean(false)});
+							tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
 						}
 					});
 				
@@ -265,7 +294,7 @@ public class FDFGui implements ActionListener,Observer
 		
 		if(arg instanceof FileElement)
 			{
-			final String str= ((FileElement) arg).getFileName();
+			final String str= ((FileElement) arg).getAbsoluteFileName();
 			
 			SwingUtilities.invokeLater(new Runnable()
 				{	
@@ -288,7 +317,7 @@ public class FDFGui implements ActionListener,Observer
 					while (tableModel.getRowCount()>0)
 						tableModel.removeRow(0);
 					for(int i=0; i<list.size(); i++)
-						tableModel.insertRow(i, new Object[]{list.get(i).getFileName(), list.get(i).getSize(), new Boolean(false)});
+						tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
 					}
 				});
 			}
