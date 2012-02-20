@@ -2,11 +2,14 @@ package com.costeaalex.fileduplicatefinder.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -37,13 +40,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableModel;
 
 
 import com.costeaalex.fileduplicatefinder.searcher.FileElement;
 import com.costeaalex.fileduplicatefinder.searcher.Searcher;
 
-public class FDFGui implements ActionListener,Observer
+public class FDFGui implements ActionListener,Observer,ComponentListener
 	{
 	static int selectedItem=-1;
 	
@@ -78,6 +80,7 @@ public class FDFGui implements ActionListener,Observer
 		jF=new JFrame("Find Duplicate Files");
 		jF.setSize(800,600);
 		jF.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		jF.addComponentListener(this);
 		
 		JPanel jPE=new JPanel();
 		jPE.setLayout(new BorderLayout());
@@ -143,16 +146,51 @@ public class FDFGui implements ActionListener,Observer
 		jPM.add(menuItemDeleteMarked);
 		
 		container=jF.getContentPane();
-		container.setLayout(new FlowLayout());
+		container.setLayout(new BorderLayout());
 		
-		container.add(jBAction);
-		container.add(jBDeleteSelected);
-		container.add(jBDeleteMarked);
-		container.add(jSPResults);
+		JPanel jp1=new JPanel();
+		jp1.setLayout(new FlowLayout());
+		
+		jp1.add(jBAction);
+		jp1.add(jBDeleteSelected);
+		jp1.add(jBDeleteMarked);
+	
+		container.add(jp1, BorderLayout.NORTH);
+		container.add(jSPResults, BorderLayout.CENTER);
 		
 		jF.setVisible(true);
 		}
+	
+	//When the JFrame resizes make the components inside resize
+	public void componentResized(ComponentEvent evt)
+		{
+		Component c = (Component)evt.getSource();
+	    final Dimension newSize = c.getSize();
+	    SwingUtilities.invokeLater(new Runnable()
+			{
+			public void run()
+				{
+			    jSPResults.setPreferredSize(new Dimension(newSize.width-20, newSize.height-70));
+			    jT.getColumnModel().getColumn(0).setPreferredWidth(71*newSize.width/100);
+				jT.getColumnModel().getColumn(1).setPreferredWidth(19*newSize.width/100);
+				jT.getColumnModel().getColumn(2).setPreferredWidth(6*newSize.width/100);
+				}
+			});
+		}
+	
+	public void componentHidden(ComponentEvent e)
+		{
+		}
 
+	public void componentMoved(ComponentEvent e)
+		{
+		}
+
+	public void componentShown(ComponentEvent e)
+		{
+		}
+
+	//Action listener may put it in new file
 	public void actionPerformed(ActionEvent e)
 		{
 		if(e.getSource() == jBAction)
@@ -185,13 +223,21 @@ public class FDFGui implements ActionListener,Observer
 			}
 		}
 	
+	//Updates the table
 	public void updateTable()
 		{
-		clearTable(tableModel);
-		for(int i=0; i<list.size(); i++)
-			tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
+		SwingUtilities.invokeLater(new Runnable()
+			{
+			public void run()
+				{
+				clearTable(tableModel);
+				for(int i=0; i<list.size(); i++)
+					tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
+				}
+			});
 		}
 	
+	//Clears the master table
 	public boolean clearTable(DefaultTableModel tableM)
 		{
 		while(tableM.getRowCount()>0)
@@ -199,26 +245,44 @@ public class FDFGui implements ActionListener,Observer
 		return true;
 		}
 	
+	//Deletes the selected rows
 	public boolean deleteSelected(int [] toDelete)
 		{
 		Vector<FileElement> toRemove=new Vector<FileElement>();
 		for(int i=0; i<toDelete.length; i++)
 			toRemove.add(list.get(toDelete[i]));
 		for(int i=0; i<toRemove.size(); i++)
+			{
+			//((FileElement) toRemove.get(i)).delete();
 			list.remove(toRemove.get(i));
-		return false;
+			}
+		updateTable();
+		return true;
 		}
 	
+	//Deletes the marked rows
 	public boolean deleteMarked()
 		{
-		
-		
-		return false;
+		Vector<FileElement> toRemove=new Vector<FileElement>();
+		for(int i=0; i<jT.getRowCount(); i++)
+			if((Boolean) jT.getValueAt(i, 2) == true)
+				toRemove.add(list.get(i));
+		for(int i=0; i<toRemove.size(); i++)
+			{
+			//((FileElement) toRemove.get(i)).delete();
+			list.remove(toRemove.get(i));
+			}
+		updateTable();
+		return true;
 		}
 
+	/*
+	 * Gets updated with information from the searcher;
+	 * 
+	 */
 	public void update(Observable o, Object arg)
 		{
-		if(arg instanceof String)
+		if(arg instanceof String)//when searcher is done
 			{
 			if(((String) arg).equals("Done"))
 				{
@@ -280,8 +344,6 @@ public class FDFGui implements ActionListener,Observer
 						
 						if (SwingUtilities.isRightMouseButton(mouseEvent))
 				            {
-				            //selectedItem=tableCustom.rowAtPoint(mouseEvent.getPoint());
-				            //tableCustom.getSelectionModel().setSelectionInterval(selectedItem, selectedItem);
 				            jPM.show(tableCustom, mouseEvent.getX(), mouseEvent.getY());
 				            }
 						}
@@ -292,7 +354,7 @@ public class FDFGui implements ActionListener,Observer
 				}
 			}
 		
-		if(arg instanceof FileElement)
+		if(arg instanceof FileElement)//when searcher finds a new file
 			{
 			final String str= ((FileElement) arg).getAbsoluteFileName();
 			
@@ -306,7 +368,7 @@ public class FDFGui implements ActionListener,Observer
 				});
 			}
 		
-		if(arg instanceof ArrayList)
+		if(arg instanceof ArrayList)//when searcher is sorted
 			{
 			final ArrayList<FileElement> list= ((ArrayList<FileElement>) arg);
 			
