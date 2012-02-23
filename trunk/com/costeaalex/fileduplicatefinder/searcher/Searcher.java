@@ -11,11 +11,13 @@ public class Searcher extends Observable implements Runnable
 	{
 	
 	private ArrayList<FileElement> fileList=new ArrayList<FileElement>();
-	File directory;
+	private File directory;
+	private int filter;
 	
-	public Searcher(File directory)
+	public Searcher(File directory, int filter)
 		{
 		this.directory=directory;
+		this.filter=filter;
 		}
 	
 	public ArrayList<FileElement> getFileList()
@@ -48,9 +50,18 @@ public class Searcher extends Observable implements Runnable
 	
 	public ArrayList<FileElement> sort()
 		{
-		Collections.sort(fileList);
-		setChanged();
-		notifyObservers(fileList);
+		if(filter==0)
+			{
+			Collections.sort(fileList);
+			setChanged();
+			notifyObservers(fileList);
+			}
+		if(filter==1)
+			{
+			Collections.sort(fileList, new SizeComparator());
+			setChanged();
+			notifyObservers(fileList);
+			}
 		return fileList;
 		}
 	

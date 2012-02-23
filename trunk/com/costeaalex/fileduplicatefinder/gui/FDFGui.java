@@ -18,12 +18,14 @@ import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -61,6 +63,8 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 	private DefaultTableModel tableModel;
 	private String [] columns = {"File", "Size", "Mark" };
 	private Popup popUpWindowError;
+	private JRadioButton [] jRB;
+	private ButtonGroup jBG;
 	
 	public FDFGui(String searchDirectory)
 		{
@@ -101,6 +105,11 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 		
 		jBAction=new JButton("Find");
 		jBAction.addActionListener(this);
+		jRB= new JRadioButton []{new JRadioButton("By name"), new JRadioButton("By size")};
+		jBG=new ButtonGroup();
+		jRB[0].setSelected(true);
+		jBG.add(jRB[0]);
+		jBG.add(jRB[1]);
 		
 		jBDeleteSelected=new JButton("Delete selected");
 		jBDeleteSelected.addActionListener(this);
@@ -145,6 +154,8 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 		jp1.setLayout(new FlowLayout());
 		
 		jp1.add(jBAction);
+		jp1.add(jRB[0]);
+		jp1.add(jRB[1]);
 		jp1.add(jBDeleteSelected);
 		jp1.add(jBDeleteMarked);
 	
@@ -157,7 +168,7 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 	//When the JFrame resizes make the components inside resize
 	public void componentResized(ComponentEvent evt)
 		{
-		Component c = (Component)evt.getSource();
+		Component c = (Component) evt.getSource();
 	    final Dimension newSize = c.getSize();
 	    SwingUtilities.invokeLater(new Runnable()
 			{
@@ -188,7 +199,11 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 		{
 		if(e.getSource() == jBAction)
 			{
-			s=new Searcher(new File(searchDirectory));
+			int b=0;
+			if(jRB[1].isSelected())
+				b=1;
+			
+			s=new Searcher(new File(searchDirectory), b);
 			sT=new Thread(s);
 			s.addObserver(this);
 			jBAction.setEnabled(false);
