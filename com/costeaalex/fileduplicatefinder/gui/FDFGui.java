@@ -68,7 +68,6 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 	
 	public FDFGui(String searchDirectory)
 		{
-		index=0;
 		this.searchDirectory=searchDirectory;
 		}
 	
@@ -203,10 +202,14 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 			if(jRB[1].isSelected())
 				b=1;
 			
+			index=0;
+			jT.clearTable();
 			s=new Searcher(new File(searchDirectory), b);
 			sT=new Thread(s);
 			s.addObserver(this);
 			jBAction.setEnabled(false);
+			jBDeleteSelected.setEnabled(false);
+			jBDeleteMarked.setEnabled(false);
 			sT.start();
 			}
 		if(e.getSource() == jBDeleteSelected)
@@ -257,6 +260,7 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 			    jT.addMouseListener(oPL);
 				jBDeleteSelected.setEnabled(true);
 				jBDeleteMarked.setEnabled(true);
+				jBAction.setEnabled(true);
 			}
 		
 		if(arg instanceof FileElement)//when searcher finds a new file

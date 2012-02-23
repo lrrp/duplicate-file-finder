@@ -42,7 +42,7 @@ public class JTableCustom extends JTable
 			{
 			public void run()
 				{
-				clearTable(tableModel);
+				clearTable();
 				for(int i=0; i<list.size(); i++)
 					tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
 				}
@@ -50,10 +50,10 @@ public class JTableCustom extends JTable
 		}
 	
 	//Clears the master table
-	public boolean clearTable(DefaultTableModel tableM)
+	public boolean clearTable()
 		{
-		while(tableM.getRowCount()>0)
-			tableM.removeRow(0);
+		while(tableModel.getRowCount()>0)
+			tableModel.removeRow(0);
 		return true;
 		}
 	
