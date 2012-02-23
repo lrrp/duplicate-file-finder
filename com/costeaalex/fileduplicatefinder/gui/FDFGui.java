@@ -10,17 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -203,19 +196,19 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 			}
 		if(e.getSource() == jBDeleteSelected)
 			{
-			deleteSelected(jT.getSelectedRows());
+			jT.deleteSelected(jT.getSelectedRows(), list);
 			}
 		if(e.getSource() == jBDeleteMarked)
 			{
-			deleteMarked();
+			jT.deleteMarked(list);
 			}
 		if(e.getSource() == menuItemDeleteSelected)
 			{
-			deleteSelected(jT.getSelectedRows());
+			jT.deleteSelected(jT.getSelectedRows(), list);
 			}
 		if(e.getSource() == menuItemDeleteMarked)
 			{
-			deleteMarked();
+			jT.deleteMarked(list);
 			}
 		if(e.getSource() == jBE)
 			{
@@ -223,59 +216,7 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 			}
 		}
 	
-	//Updates the table
-	public void updateTable()
-		{
-		SwingUtilities.invokeLater(new Runnable()
-			{
-			public void run()
-				{
-				clearTable(tableModel);
-				for(int i=0; i<list.size(); i++)
-					tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
-				}
-			});
-		}
 	
-	//Clears the master table
-	public boolean clearTable(DefaultTableModel tableM)
-		{
-		while(tableM.getRowCount()>0)
-			tableM.removeRow(0);
-		return true;
-		}
-	
-	//Deletes the selected rows
-	public boolean deleteSelected(int [] toDelete)
-		{
-		Vector<FileElement> toRemove=new Vector<FileElement>();
-		for(int i=0; i<toDelete.length; i++)
-			toRemove.add(list.get(toDelete[i]));
-		for(int i=0; i<toRemove.size(); i++)
-			{
-			//((FileElement) toRemove.get(i)).delete();
-			list.remove(toRemove.get(i));
-			}
-		updateTable();
-		return true;
-		}
-	
-	//Deletes the marked rows
-	public boolean deleteMarked()
-		{
-		Vector<FileElement> toRemove=new Vector<FileElement>();
-		for(int i=0; i<jT.getRowCount(); i++)
-			if((Boolean) jT.getValueAt(i, 2) == true)
-				toRemove.add(list.get(i));
-		for(int i=0; i<toRemove.size(); i++)
-			{
-			//((FileElement) toRemove.get(i)).delete();
-			list.remove(toRemove.get(i));
-			}
-		updateTable();
-		return true;
-		}
-
 	/*
 	 * Gets updated with information from the searcher;
 	 * 
@@ -295,63 +236,12 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 				
 				this.list=list;
 				
-				SwingUtilities.invokeLater(new Runnable()
-					{
-					public void run()
-						{
-						while (tableModel.getRowCount()>0)
-							tableModel.removeRow(0);
-						for(int i=0; i<list.size(); i++)
-							tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
-						}
-					});
-				
-				MouseListener mouseListener = new MouseAdapter() 
-					{
-					public void mouseClicked(MouseEvent mouseEvent) 
-						{
-						JTableCustom tableCustom = (JTableCustom) mouseEvent.getSource();
-						if (mouseEvent.getClickCount() == 2) 
-							{
-							int index = tableCustom.rowAtPoint(mouseEvent.getPoint());
-							int column = tableCustom.columnAtPoint(mouseEvent.getPoint()); 
-							if (index >= 0 && column!=2) 
-								{
-								FileElement f = list.get(index);
-								try
-									{
-									f.open();
-									}
-								catch (IOException e)
-									{
-									try
-										{
-										FileWriter errorLog=new FileWriter("Error.log", true);
-										BufferedWriter out = new BufferedWriter(errorLog);
-										out.write(e.getMessage());	
-										out.flush();
-										out.close();
-										popUpWindowError.show();
-										}
-									catch (IOException e1)
-										{
-										e1.printStackTrace();
-										}
-									e.printStackTrace();
-									}
-								}
-							}
-						
-						if (SwingUtilities.isRightMouseButton(mouseEvent))
-				            {
-				            jPM.show(tableCustom, mouseEvent.getX(), mouseEvent.getY());
-				            }
-						}
-					};
-			    jT.addMouseListener(mouseListener);
+				jT.updateTable(list);
+				};
+				OpenFileListener oPL=new OpenFileListener(list, popUpWindowError, jPM);
+			    jT.addMouseListener(oPL);
 				jBDeleteSelected.setEnabled(true);
 				jBDeleteMarked.setEnabled(true);
-				}
 			}
 		
 		if(arg instanceof FileElement)//when searcher finds a new file
@@ -362,7 +252,7 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 				{	
 				public void run()
 					{
-					tableModel.insertRow(index, new Object[]{str, "", new Boolean(false)});
+					jT.insertRow(index, new Object[]{str, "", new Boolean(false)});
 					index++;
 					}
 				});
@@ -372,16 +262,7 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 			{
 			final ArrayList<FileElement> list= ((ArrayList<FileElement>) arg);
 			
-			SwingUtilities.invokeLater(new Runnable()
-				{
-				public void run()
-					{
-					while (tableModel.getRowCount()>0)
-						tableModel.removeRow(0);
-					for(int i=0; i<list.size(); i++)
-						tableModel.insertRow(i, new Object[]{list.get(i).getAbsoluteFileName(), list.get(i).getSize(), new Boolean(false)});
-					}
-				});
+			jT.updateTable(list);
 			}
 		}
 	}

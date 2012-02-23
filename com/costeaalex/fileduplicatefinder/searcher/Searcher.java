@@ -106,7 +106,7 @@ public class Searcher extends Observable implements Runnable
 		{
 		search(directory);
 		sort();
-		//clean();
+		clean();
 		setChanged();
 		notifyObservers("Done");
 		}
