@@ -7,7 +7,7 @@ public class FDF
 	
 	public static void main(String [] args)
 		{
-		FDFGui fG=new FDFGui("test");
+		FDFGui fG=new FDFGui(".");
 		fG.buildGui();
 		}
 	
