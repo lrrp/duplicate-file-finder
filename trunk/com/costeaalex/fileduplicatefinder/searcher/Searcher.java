@@ -73,7 +73,7 @@ public class Searcher extends Observable implements Runnable
 		FileElement dup=fileList.get(0);
 		for(i=1; i<fileList.size(); i++)
 			{
-			if(fileList.get(i).equals(dup))
+			if(fileList.get(i).equals(dup)) // TODO add filter condition
 				{
 				dup=fileList.get(i);
 				dupcount++;
