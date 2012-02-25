@@ -277,8 +277,9 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 				});
 			}
 		
-		if(arg instanceof ArrayList)//when searcher is sorted
+		if(arg instanceof ArrayList<?>)//when searcher is sorted
 			{
+			@SuppressWarnings("unchecked")
 			final ArrayList<FileElement> list= ((ArrayList<FileElement>) arg);
 			
 			jT.updateTable(list);
