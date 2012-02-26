@@ -40,10 +40,13 @@ public class Searcher extends Observable implements Runnable
 			else
 				{
 				File f=new File(directory.getAbsolutePath()+"\\"+files[i]);
-				FileElement fE=new FileElement(f);
-				fileList.add(fE);
-				setChanged();
-				notifyObservers(fE);
+				if(f.isFile())
+					{
+					FileElement fE=new FileElement(f);
+					fileList.add(fE);
+					setChanged();
+					notifyObservers(fE);
+					}
 				}
 			}
 		}
@@ -73,7 +76,7 @@ public class Searcher extends Observable implements Runnable
 		FileElement dup=fileList.get(0);
 		for(i=1; i<fileList.size(); i++)
 			{
-			if(fileList.get(i).equals(dup)) // TODO add filter condition
+			if(filter(fileList.get(i), dup)) // TODO add filter condition
 				{
 				dup=fileList.get(i);
 				dupcount++;
@@ -120,5 +123,16 @@ public class Searcher extends Observable implements Runnable
 		clean();
 		setChanged();
 		notifyObservers("Done");
+		}
+	
+	private boolean filter(FileElement a, FileElement b)
+		{
+		if(filter==0)
+			if(a.equals(b))
+				return true;
+		if(filter==1)
+			if(a.getSize()==b.getSize())
+				return true;
+		return false;
 		}
 	}
