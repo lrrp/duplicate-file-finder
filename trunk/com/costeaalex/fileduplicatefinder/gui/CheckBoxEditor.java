@@ -64,25 +64,17 @@ public class CheckBoxEditor extends JCheckBox implements TableCellEditor, ItemLi
 
 	public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
 		{
-		this.setSelected((Boolean)value);
-		if(!(Boolean)value)
-			table.getSelectionModel().addSelectionInterval(row, row);
+		this.setSelected((Boolean)value); 
 		return this;
 		}
 	
 	public void updateSelected(JTable table)
 		{
-		boolean b=false;
 		for(int i=0; i<table.getRowCount(); i++)
 			if((Boolean) table.getValueAt(i, 2))
-				b=true;
-		
-		if(b)
-			for(int i=0; i<table.getRowCount(); i++)
-				if((Boolean) table.getValueAt(i, 2))
-					table.getSelectionModel().addSelectionInterval(i, i);
-				else
-					table.getSelectionModel().removeSelectionInterval(i, i);
+				table.getSelectionModel().addSelectionInterval(i, i);
+			else
+				table.getSelectionModel().removeSelectionInterval(i, i);
 		}
 
 	public void itemStateChanged(ItemEvent e)
