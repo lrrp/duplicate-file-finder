@@ -65,10 +65,12 @@ public class JTableCustom extends JTable
 			toRemove.add(list.get(toDelete[i]));
 		for(int i=0; i<toRemove.size(); i++)
 			{
+			//TODO
 			//((FileElement) toRemove.get(i)).delete();
+			tableModel.removeRow(toDelete[i]-i);
 			list.remove(toRemove.get(i));
 			}
-		updateTable(list);
+		//updateTable(list);
 		return true;
 		}
 	
@@ -76,19 +78,24 @@ public class JTableCustom extends JTable
 	public boolean deleteMarked(ArrayList<FileElement> list)
 		{
 		Vector<FileElement> toRemove=new Vector<FileElement>();
+		Vector<Integer> toDelete=new Vector<Integer>();
 		for(int i=0; i<this.getRowCount(); i++)
 			if((Boolean) this.getValueAt(i, 2) == true)
+				{
 				toRemove.add(list.get(i));
+				toDelete.add(i);
+				}
+		
 		for(int i=0; i<toRemove.size(); i++)
-			{
-			//((FileElement) toRemove.get(i)).delete();
 			list.remove(toRemove.get(i));
-			}
-		updateTable(list);
+		
+		for(int i=0; i<toDelete.size(); i++)
+			tableModel.removeRow(toDelete.get(i)-i);
+		//updateTable(list);
 		return true;
 		}
 
-	//inserts a row
+	//Inserts a row
 	public void insertRow(int val1, Object [] val2)
 		{
 		tableModel.insertRow(val1, val2);
