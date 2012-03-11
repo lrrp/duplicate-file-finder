@@ -63,13 +63,17 @@ public class JTableCustom extends JTable
 		Vector<FileElement> toRemove=new Vector<FileElement>();
 		for(int i=0; i<toDelete.length; i++)
 			toRemove.add(list.get(toDelete[i]));
+		
+		for(int i=0; i<toRemove.size(); i++)
+			tableModel.removeRow(toDelete[i]-i);
+		
 		for(int i=0; i<toRemove.size(); i++)
 			{
-			//TODO
-			//((FileElement) toRemove.get(i)).delete();
-			tableModel.removeRow(toDelete[i]-i);
 			list.remove(toRemove.get(i));
+			//((FileElement) toRemove.get(i)).delete();
 			}
+		
+		sweepForSingles(list);
 		//updateTable(list);
 		return true;
 		}
@@ -86,11 +90,16 @@ public class JTableCustom extends JTable
 				toDelete.add(i);
 				}
 		
-		for(int i=0; i<toRemove.size(); i++)
-			list.remove(toRemove.get(i));
-		
 		for(int i=0; i<toDelete.size(); i++)
 			tableModel.removeRow(toDelete.get(i)-i);
+		
+		for(int i=0; i<toRemove.size(); i++)
+			{
+			list.remove(toRemove.get(i));
+			//((FileElement) toRemove.get(i)).delete();
+			}
+		
+		sweepForSingles(list);
 		//updateTable(list);
 		return true;
 		}
@@ -99,5 +108,41 @@ public class JTableCustom extends JTable
 	public void insertRow(int val1, Object [] val2)
 		{
 		tableModel.insertRow(val1, val2);
+		}
+	
+	private void sweepForSingles(ArrayList<FileElement> list)
+		{
+		Vector<Integer> toDelete=new Vector<Integer>();
+		int i=0;
+		
+		if(list.size()>1)
+			{
+			if(!list.get(i).equals(list.get(i+1)))
+				{
+				toDelete.add(i);
+				list.remove(list.get(i));
+				}
+			
+			for(i=1; i<list.size()-1; i++)
+				{
+				if(!list.get(i).equals(list.get(i-1)) && !list.get(i).equals(list.get(i+1)))
+					{
+					toDelete.add(i);
+					list.remove(list.get(i));
+					}
+				}
+			
+			i=list.size()-1;
+			if(!list.get(i).equals(list.get(i-1)))
+				{
+				toDelete.add(i);
+				list.remove(list.get(i));
+				}
+			}
+		else
+			toDelete.add(0);
+			
+		for(i=0; i<toDelete.size(); i++)
+			tableModel.removeRow(toDelete.get(i)-i);
 		}
 	}
