@@ -70,7 +70,7 @@ public class JTableCustom extends JTable
 		for(int i=0; i<toRemove.size(); i++)
 			{
 			list.remove(toRemove.get(i));
-			((FileElement) toRemove.get(i)).delete();
+			//((FileElement) toRemove.get(i)).delete();
 			}
 		
 		sweepForSingles(list);
@@ -114,7 +114,7 @@ public class JTableCustom extends JTable
 		for(int i=0; i<toRemove.size(); i++)
 			{
 			list.remove(toRemove.get(i));
-			((FileElement) toRemove.get(i)).delete();
+			//((FileElement) toRemove.get(i)).delete();
 			}
 		
 		sweepForSingles(list);
@@ -130,35 +130,40 @@ public class JTableCustom extends JTable
 	
 	private void sweepForSingles(ArrayList<FileElement> list)
 		{
+		Vector<FileElement> toRemove=new Vector<FileElement>();
 		Vector<Integer> toDelete=new Vector<Integer>();
 		int i=0;
-		
+			
 		if(list.size()>1)
 			{
 			if(!list.get(i).equals(list.get(i+1)))
 				{
+				toRemove.add(list.get(i));
 				toDelete.add(i);
-				list.remove(list.get(i));
 				}
 			
 			for(i=1; i<list.size()-1; i++)
-				{
 				if(!list.get(i).equals(list.get(i-1)) && !list.get(i).equals(list.get(i+1)))
 					{
+					toRemove.add(list.get(i));
 					toDelete.add(i);
-					list.remove(list.get(i));
 					}
-				}
 			
 			i=list.size()-1;
 			if(!list.get(i).equals(list.get(i-1)))
 				{
+				toRemove.add(list.get(i));
 				toDelete.add(i);
-				list.remove(list.get(i));
 				}
 			}
 		else
+			{
+			toRemove.add(list.get(0));
 			toDelete.add(0);
+			}
+		
+		for(i=0; i<toRemove.size(); i++)
+			list.remove(toRemove.get(i));
 			
 		for(i=0; i<toDelete.size(); i++)
 			tableModel.removeRow(toDelete.get(i)-i);
