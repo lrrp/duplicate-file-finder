@@ -70,7 +70,7 @@ public class JTableCustom extends JTable
 		for(int i=0; i<toRemove.size(); i++)
 			{
 			list.remove(toRemove.get(i));
-			//((FileElement) toRemove.get(i)).delete();
+			((FileElement) toRemove.get(i)).delete();
 			}
 		
 		sweepForSingles(list);
@@ -78,6 +78,24 @@ public class JTableCustom extends JTable
 		return true;
 		}
 	
+	//Deletes the selected entries
+	public boolean deleteSelectedEntries(int [] toDelete, ArrayList<FileElement> list)
+		{
+		Vector<FileElement> toRemove=new Vector<FileElement>();
+		for(int i=0; i<toDelete.length; i++)
+			toRemove.add(list.get(toDelete[i]));
+
+		for(int i=0; i<toRemove.size(); i++)
+			tableModel.removeRow(toDelete[i]-i);
+
+		for(int i=0; i<toRemove.size(); i++)
+			list.remove(toRemove.get(i));
+
+		sweepForSingles(list);
+		//updateTable(list);
+		return true;
+		}
+
 	//Deletes the marked rows
 	public boolean deleteMarked(ArrayList<FileElement> list)
 		{
@@ -96,7 +114,7 @@ public class JTableCustom extends JTable
 		for(int i=0; i<toRemove.size(); i++)
 			{
 			list.remove(toRemove.get(i));
-			//((FileElement) toRemove.get(i)).delete();
+			((FileElement) toRemove.get(i)).delete();
 			}
 		
 		sweepForSingles(list);

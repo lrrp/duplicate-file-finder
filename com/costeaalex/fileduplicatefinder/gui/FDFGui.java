@@ -56,6 +56,7 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 	private int index;
 	private JPopupMenu jPM;
 	private JMenuItem menuItemDeleteSelected;
+	private JMenuItem menuItemDeleteSelectedEntries;
 	private JMenuItem menuItemDeleteMarked;
 	private String searchDirectory;
 	private ArrayList<FileElement> list;
@@ -141,10 +142,13 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 		jPM=new JPopupMenu();
 		menuItemDeleteSelected = new JMenuItem("Delete Selected");
 		menuItemDeleteMarked = new JMenuItem("Delete Marked");
+		menuItemDeleteSelectedEntries = new JMenuItem("Delete Selected Entries");
 		menuItemDeleteSelected.addActionListener(this);
 		menuItemDeleteMarked.addActionListener(this);
+		menuItemDeleteSelectedEntries.addActionListener(this);
 		jPM.add(menuItemDeleteSelected);
 		jPM.add(menuItemDeleteMarked);
+		jPM.add(menuItemDeleteSelectedEntries);
 		
 		container=jF.getContentPane();
 		container.setLayout(new BorderLayout());
@@ -227,6 +231,10 @@ public class FDFGui implements ActionListener,Observer,ComponentListener
 		if(e.getSource() == menuItemDeleteMarked)
 			{
 			jT.deleteMarked(list);
+			}
+		if(e.getSource() == menuItemDeleteSelectedEntries)
+			{
+			jT.deleteSelectedEntries(jT.getSelectedRows(), list);
 			}
 		if(e.getSource() == jBE)
 			{
