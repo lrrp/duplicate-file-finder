@@ -9,7 +9,7 @@ public class FDF
 	
 	public static void main(String [] args)
 		{
-		FDFGui fG=new FDFGui(new File("test").getAbsolutePath());
+		FDFGui fG=new FDFGui(new File(".").getAbsolutePath());
 		fG.buildGui();
 		}
 	
