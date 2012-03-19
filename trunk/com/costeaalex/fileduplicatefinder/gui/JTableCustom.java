@@ -70,7 +70,7 @@ public class JTableCustom extends JTable
 		for(int i=0; i<toRemove.size(); i++)
 			{
 			list.remove(toRemove.get(i));
-			//((FileElement) toRemove.get(i)).delete();
+			((FileElement) toRemove.get(i)).delete();
 			}
 		
 		sweepForSingles(list);
@@ -114,7 +114,7 @@ public class JTableCustom extends JTable
 		for(int i=0; i<toRemove.size(); i++)
 			{
 			list.remove(toRemove.get(i));
-			//((FileElement) toRemove.get(i)).delete();
+			((FileElement) toRemove.get(i)).delete();
 			}
 		
 		sweepForSingles(list);
